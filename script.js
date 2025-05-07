@@ -23,50 +23,41 @@ document.body.appendChild(parentDiv);
 const bookList = document.querySelector('#book-list');
 parentDiv.appendChild(bookList);
 
-for (const book of myLibrary) {
+function makeBookDiv(book) {
   let bookDiv = document.createElement('div');
-
   let bookTitle = document.createElement('p')
-  bookTitle.innerText = book.title;
-
   let bookAuthor = document.createElement('p');
-  bookAuthor.innerText = book.author;
-
   let pageCount = document.createElement('p');
+  let deleteButton = document.createElement('button');
+  let readButton = document.createElement('button');
+
+  bookTitle.innerText = book.title;
+  bookAuthor.innerText = book.author;
   pageCount.innerText = book.pageCount;
 
-  let isRead = document.createElement('p');
-  isRead.innerText = book.read ? 'read' : 'not read';
+  deleteButton.innerText = 'x';
+  deleteButton.dataset.action = 'delete'
 
-  let bookButton = document.createElement('button');
-  bookButton.innerText = 'x';
+  readButton.innerText = book.read ? 'mark unread' : 'mark read';
+  readButton.dataset.action = 'toggle-read';
 
   bookDiv.appendChild(bookTitle);
   bookDiv.appendChild(bookAuthor);
   bookDiv.appendChild(pageCount);
-  bookDiv.appendChild(isRead);
-  bookDiv.appendChild(bookButton);
+  bookDiv.appendChild(deleteButton);
+  bookDiv.appendChild(readButton);
 
-  bookButton.setAttribute('data-index-number', book.id)
+  readButton.dataset.indexNumber = book.id;
+  deleteButton.dataset.indexNumber = book.id;
 
-  bookList.appendChild(bookDiv);
+  return bookDiv;
 }
 
-const newBookButton = document.querySelector('#add-book');
-const closeBookModal = document.querySelector('#close-modal');
-
-const newBookDialog = document.querySelector('#new-book')
-
-function closeNewBookDialog() {
-  newBookDialog.removeAttribute('open');
+function renderInitialList() {
+  for (const book of myLibrary) {
+    bookList.appendChild(makeBookDiv(book));
+  }
 }
-
-function openNewBookDialog() {
-  newBookDialog.setAttribute('open', true);
-}
-
-newBookButton.addEventListener('click', openNewBookDialog);
-closeBookModal.addEventListener('click', closeNewBookDialog);
 
 const bookForm = document.querySelector('#book-form');
 
@@ -81,52 +72,32 @@ bookForm.addEventListener('submit', (e) => {
   const pageCount = formData.get('pages');
   const read = formData.get('read');
 
-  const id = addBookToLibrary(title, author, pageCount, read).id;
-
-  let bookDiv = document.createElement('div');
-
-  let bookTitle = document.createElement('p')
-  bookTitle.innerText = title;
-
-  let bookAuthor = document.createElement('p');
-  bookAuthor.innerText = author;
-
-  let pages = document.createElement('p');
-  pageCount.innerText = pageCount;
-
-  let isRead = document.createElement('p');
-  isRead.innerText = read ? 'read' : 'not read';
-
-  let bookButton = document.createElement('button');
-  bookButton.innerText = 'x';
-
-  bookDiv.appendChild(bookTitle);
-  bookDiv.appendChild(bookAuthor);
-  bookDiv.appendChild(pages);
-  bookDiv.appendChild(isRead);
-  bookDiv.appendChild(bookButton);
-
-  bookButton.setAttribute('data-index-number', id)
-  bookButton.addEventListener("click", (e) => {
-    const index = myLibrary.findIndex(book => book.id === id);
-    myLibrary.splice(index, 1);
-    console.log(myLibrary);
-
-    e.currentTarget.parentElement.remove();
-  });
-
-  bookList.appendChild(bookDiv);
+  const book = addBookToLibrary(title, author, pageCount, read);
+  let div = makeBookDiv(book);
+  bookList.appendChild(div);
 });
 
 const books = document.querySelectorAll("[data-index-number]");
 
-for (let bookDivLol of books) {
-  const bookId = bookDivLol.dataset.indexNumber;
-  bookDivLol.addEventListener("click", (e) => {
-    const index = myLibrary.findIndex(book => book.id === bookId);
-    myLibrary.splice(index, 1);
-    console.log(myLibrary);
+bookList.addEventListener('click', (e) => {
+  const btn = e.target;
+  if (!btn.matches('button[data-action]')) return;
 
-    e.currentTarget.parentElement.remove();
-  });
-}
+  const id = btn.dataset.indexNumber;
+  const index = myLibrary.findIndex(book => book.id === id);
+  // console.log(myLibrary, id, index, btn.dataset.action);
+
+  if (btn.dataset.action === 'delete') {
+    myLibrary.splice(index, 1);
+    btn.parentElement.remove();
+  } else if (btn.dataset.action === 'toggle-read') {
+    const book = myLibrary[index];
+    book.read = !book.read;
+    btn.innerText = book.read ? 'mark unread' : 'mark read';
+  } else {
+    console.log('something else')
+  }
+
+})
+
+renderInitialList();

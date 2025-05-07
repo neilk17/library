@@ -1,0 +1,34 @@
+/* quick minimal styling so the layout looks tidy without external CSS */
+body {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  padding: 2rem;
+}
+h1 {
+  margin-bottom: 1rem;
+}
+#book-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.book-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 1rem;
+  align-items: center;
+}
+.book-card p {
+  margin: 0;
+}
+.delete-btn {
+  background: crimson;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
