@@ -35,7 +35,7 @@ function makeBookDiv(book) {
   bookAuthor.innerText = book.author;
   pageCount.innerText = book.pageCount;
 
-  deleteButton.innerText = 'x';
+  deleteButton.innerText = 'delete';
   deleteButton.dataset.action = 'delete'
 
   readButton.innerText = book.read ? 'mark unread' : 'mark read';
